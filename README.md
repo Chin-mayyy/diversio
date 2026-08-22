@@ -224,6 +224,3 @@ is rejected during resolution.
 Built with assistance from an LLM coding agent (**ox-alpha**); implementation
 plan, code, tests, and this document were reviewed and verified locally by
 running the test suite and exercising the app manually.
-
-- Time spent: _(fill in after completing your walkthrough — the assignment asks
-  you to record your own coding timebox)_
