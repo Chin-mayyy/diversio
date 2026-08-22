@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Upload Error{% endblock %}
+{% block content %}
+<h1>Upload could not be processed</h1>
+<p><strong>{{ message }}</strong></p>
+<p>Please check that the file is a valid UTF-8 CSV with the required columns and try again.</p>
+<p><a href="/">&larr; Back to upload</a></p>
+{% endblock %}

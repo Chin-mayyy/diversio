@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>HRIS Import Preview</h1>
+<p>Upload an HRIS CSV export to preview employees, reporting hierarchy, and data problems before anything is imported.</p>
+
+<form action="/upload" method="post" enctype="multipart/form-data">
+  <label for="file">CSV file</label>
+  <input type="file" id="file" name="file" accept=".csv,text/csv" required>
+  <button type="submit">Upload &amp; Preview</button>
+</form>
+
+<p>
+  Expected columns (any order):<br>
+  <code>employee_id, employee_name, email, manager_id, manager_email, department</code>
+</p>
+{% endblock %}

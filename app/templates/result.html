@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Import Preview Result{% endblock %}
+{% block content %}
+<h1>Import Preview</h1>
+<p><a href="/">&larr; Upload another file</a></p>
+
+<section class="summary">
+  <span><b>{{ preview.total_source_rows }}</b> source rows</span>
+  <span><b>{{ preview.accepted_count }}</b> accepted employees</span>
+  <span><b>{{ preview.identity_errors | length }}</b> identity errors</span>
+  <span><b>{{ preview.manager_errors | length }}</b> manager errors</span>
+  <span><b>{{ preview.roots | length }}</b> roots</span>
+  <span><b>{{ preview.cyclic_employees | length }}</b> cyclic employees</span>
+</section>
+
+<h2>Root employees <small>(no manager)</small></h2>
+{% if preview.roots %}
+<table>
+  <tr><th>Source row</th><th>Employee ID</th><th>Name</th><th>Email</th><th>Department</th></tr>
+  {% for emp in preview.roots %}
+  <tr><td>{{ emp.source_row }}</td><td>{{ emp.employee_id }}</td><td>{{ emp.name }}</td>
+      <td>{{ emp.email }}</td><td>{{ emp.department }}</td></tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="none">No root employees found.</p>
+{% endif %}
+
+<h2>Managers and direct-report counts</h2>
+{% if preview.direct_reports %}
+<table>
+  <tr><th>Manager</th><th>ID</th><th>Direct reports</th><th>Reports</th></tr>
+  {% for entry in preview.direct_reports %}
+  <tr>
+    <td>{{ entry.manager.name or "(unnamed)" }}</td>
+    <td><span class="badge">{{ entry.manager.employee_id }}</span></td>
+    <td>{{ entry.count }}</td>
+    <td>{% for report in entry.reports %}<span class="badge">{{ report.employee_id }}</span> {{ report.name }}{% if not loop.last %}, {% endif %}{% endfor %}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="none">No manager/direct-report relationships were resolved.</p>
+{% endif %}
+
+<h2>Reporting cycles</h2>
+{% if preview.cyclic_employees %}
+<p>The following employees participate in a reporting cycle:</p>
+<table>
+  <tr><th>Employee ID</th><th>Name</th><th>Email</th></tr>
+  {% for emp in preview.cyclic_employees %}
+  <tr class="error-row"><td><span class="badge">{{ emp.employee_id }}</span></td><td>{{ emp.name }}</td><td>{{ emp.email }}</td></tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="none">No reporting cycles detected.</p>
+{% endif %}
+
+<h2>Identity errors <small>(row excluded from import and hierarchy)</small></h2>
+{% if preview.identity_errors %}
+<table>
+  <tr><th>CSV row</th><th>Type</th><th>Employee ID</th><th>Email</th><th>Problem</th></tr>
+  {% for err in preview.identity_errors %}
+  <tr class="error-row"><td>{{ err.row_number }}</td><td>{{ err.error_type.value }}</td>
+      <td>{{ err.employee_id or "" }}</td><td>{{ err.email or "" }}</td><td>{{ err.message }}</td></tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="none">None.</p>
+{% endif %}
+
+<h2>Manager resolution errors <small>(employee accepted, relationship dropped)</small></h2>
+{% if preview.manager_errors %}
+<table>
+  <tr><th>CSV row</th><th>Type</th><th>Employee ID</th><th>Problem</th></tr>
+  {% for err in preview.manager_errors %}
+  <tr class="error-row"><td>{{ err.row_number }}</td><td>{{ err.error_type.value }}</td>
+      <td>{{ err.employee_id or "" }}</td><td>{{ err.message }}</td></tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="none">None.</p>
+{% endif %}
+
+<h2>Accepted employees ({{ preview.accepted_count }})</h2>
+{% if preview.accepted_employees %}
+<table>
+  <tr><th>Source row</th><th>Employee ID</th><th>Name</th><th>Email</th><th>Department</th><th>Manager ref</th></tr>
+  {% for emp in preview.accepted_employees %}
+  <tr><td>{{ emp.source_row }}</td><td>{{ emp.employee_id }}</td><td>{{ emp.name }}</td>
+      <td>{{ emp.email }}</td><td>{{ emp.department }}</td>
+      <td>{{ emp.manager_id or "" }}{% if emp.manager_id and emp.manager_email %} / {% endif %}{{ emp.manager_email or "" }}</td></tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="none">No employees were accepted.</p>
+{% endif %}
+{% endblock %}
